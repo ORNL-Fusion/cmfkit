@@ -1,0 +1,177 @@
+#!/bin/bash
+
+_debug() {
+
+  local readonly msg="$1"
+
+  echo "."
+  echo "bungalow >> [Debug] << ${msg}"
+  echo "."
+}
+
+
+_error() {
+
+  local readonly msg="$1"
+
+  echo "."
+  echo "."
+  echo "bungalow >> [Error] << ${msg}"
+  echo "."
+  echo "."
+
+  return 1
+}
+
+
+_error_fatal() {
+
+  local readonly msg="$1"
+
+  echo "."
+  echo "."
+  echo "bungalow >> [Fatal Error] << ${msg}"
+  echo "."
+  echo "."
+
+  exit 1
+}
+
+
+_yield_image_readybake() {
+
+  local readonly outsetdir="$( pwd -P )"
+  local readonly scriptdir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+  local rc
+
+  cd $(mktemp -d) || return 1
+
+  cp ${scriptdir}/bodega .
+
+  cat > ./Dockerfile <<-__EOF__
+
+	FROM rikorose/gcc-cmake:gcc-10
+	COPY ./bodega /usr/local/bin
+	RUN set -x \
+	  && chmod +x /usr/local/bin/bodega \
+	  && mkdir -p /var/bungalow
+
+	WORKDIR /var/bungalow
+
+	__EOF__
+
+  echo; echo "${PWD}"; cat ./Dockerfile ; echo; echo; echo
+  DOCKER_BUILDKIT=1 docker build --tag bungalow_readybake .
+
+  rc="$?"
+
+  cd -
+  [[ ${OLDPWD} != ${outsetdir} ]] && rm -rf ${OLDPWD}
+
+  return "${rc}"
+}
+
+
+_yield_image_readybake_alpine() {
+
+  local readonly outsetdir="${PWD}"
+  cd $(mktemp -d) || _error_fatal "unable to allocate temp dir"
+
+  cat > ./Dockerfile <<-__EOF__
+
+	FROM alpine:3.14.2
+	RUN set -x \
+	  && apk add --no-cache \
+	      cmake gfortran libgfortran netcdf-dev
+
+	__EOF__
+
+  cat > ./.env <<-__EOF__
+
+	FC=gfortran
+	CXX=g++
+	NETCDF_FLAGS=" -D_NETCDF"
+	L_NETCDF=" -L/usr/lib/x86_64-linux-gnu/lib -lnetcdff"
+	I_NETCDF=" -I/usr/include"
+
+	__EOF__
+
+  echo; echo "${PWD}"; cat ./*; echo; echo; echo
+  docker build --tag bungalow_readybake_alpine .
+
+  cd -
+  [[ "${OLDPWD}" != "${outsetdir}" ]] && rm -rf ${OLDPWD}
+}
+
+
+_yield_image_readybake_centos() {
+
+  echo
+}
+
+
+_yield_image_readybake_debian() {
+
+  echo
+}
+
+
+_yield_image_readybake_ubuntu() {
+
+  echo
+}
+
+
+_ready_buildenv() {
+
+  local readonly flavor="$1"
+  local readonly readybake_image="bungalow_readybake${flavor:+_}${flavor}:latest"
+  #local readonly current_dirname="${PWD##*/}"
+
+  local container_id
+
+  read container_id <<< $(
+  	docker create --interactive --tty ${readybake_image}
+  )
+
+  [[ -n ${container_id} ]] || return 1
+
+  docker cp . ${container_id}:/var/bungalow
+  #docker cp . ${container_id}:/var/bungalow/${current_dirname}
+
+  BUILDENV_CONTAINER_ID="${container_id}"
+}
+
+
+__bungalow_build() {
+
+  local readonly os_id="${1,,}"
+  #local readonly current_dirname="${PWD##*/}"
+
+  _yield_image_readybake  || _error_fatal "_yield_image_readybake"
+  _ready_buildenv         || _error_fatal "_ready_buildenv"
+
+  docker start  $BUILDENV_CONTAINER_ID
+
+  docker exec \
+    --interactive $BUILDENV_CONTAINER_ID \
+    /bin/sh -c "bodega build" || _error "build failure"
+
+  docker stop   $BUILDENV_CONTAINER_ID
+  docker rm     $BUILDENV_CONTAINER_ID
+
+  echo
+}
+
+
+#__bungalow_trace() {}
+__bungalow_debug() {
+
+  echo
+}
+
+
+BUILDENV_CONTAINER_ID=""
+
+[[ -n "$1" ]] && "__bungalow_$1" "$@"
+

@@ -1,0 +1,41 @@
+
+
+
+_load_scenario() {
+
+  local readonly descriptor="$1"
+
+  cd ${BASH_SOURCE[0]%/*}
+
+  cd - >/dev/null
+}
+
+
+__bodie_build() {
+
+  _denote_varlist_outset
+
+
+  # list of CMake definition variables to import from existing environment
+  _uptake_varlist_outset \
+    CMAKE_BUILD_TYPE \
+    CMAKE_Fortran_COMPILER
+
+  # declare default CMake defs
+  _enact_defaults_cmake
+
+  # commit outstanding CMake def variables to the final roster
+  _accrue_varlist_cmake_definitions
+
+  # convert the CMake def final roster to CMake cmdline form
+  _render_cmdline_cmake_definitions
+
+  echo; echo; _debug "print CMake definitions - BEGIN"
+  echo; echo $BOWTIE_CMDLINE_CMAKE_DEFINITIONS | tr ' ' '\n'
+  echo; echo; _debug "print CMake definitions - END"
+  echo; echo
+
+  mkdir -p ./build && cd $_
+  cmake $BOWTIE_CMDLINE_CMAKE_DEFINITIONS .. && make
+}
+
