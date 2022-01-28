@@ -101,15 +101,10 @@ _deflist_render_cmdline() {
 #_cmfkit_render_cmdline_cmake_definitions
 
 
-#_init
-
-#CMFKIT_VARLIST_OUTSET
-#CMFKIT_VARLIST_CMAKE_DEFINITIONS
-#CMFKIT_CMDLINE_CMAKE_DEFINITIONS
-
-
 CMFKIT_VARLIST_OUTSET=''
 CMFKIT_VARLIST_CMAKE_DEFINITIONS=''
 CMFKIT_CMDLINE_CMAKE_DEFINITIONS=''
 
+# global state nomenclature stipulates CMFKIT_ prefix on relevant vars
+# => deflist functions are scoped under CMFKIT context
 
