@@ -1,0 +1,115 @@
+
+
+_init() {
+
+  local readonly deflist_id=$(( $RANDOM % 10000 + 40000 ))
+
+  CMFKIT_${deflist_id}_VARLIST_OUTSET=''
+  CMFKIT_${deflist_id}_VARLIST_CMAKE_DEFINITIONS=''
+  CMFKIT_${deflist_id}_CMDLINE_CMAKE_DEFINITIONS=''
+}
+
+
+_deflist_purge() {
+
+  echo
+}
+
+
+_deflist_evict() {
+
+  echo
+}
+
+
+_deflist_denote_outset() {
+
+  local outset_vars
+
+  read outset_vars <<< $(
+    set 2>/dev/null | while read a
+      do [[ $a == *=* ]] || break
+        echo -n "${a:+ }${a/=*}"
+      done
+  )
+
+  BODEGA_VARLIST_OUTSET="${outset_vars}"
+}
+
+
+_deflist_uptake_outset() {
+
+  local uptake_vars="$@"
+  local outset_vars
+
+  read match_vars <<< $(
+    echo $BODEGA_VARLIST_OUTSET ${uptake_vars} | tr ' ' '\n' | sort | uniq -d | tr '\n' ' '
+  )
+
+  read outset_vars <<< $(
+    echo $BODEGA_VARLIST_OUTSET ${match_vars}  | tr ' ' '\n' | sort | uniq -u | tr '\n' ' '
+  )
+
+  BODEGA_VARLIST_OUTSET="${outset_vars}"
+}
+
+
+_deflist_accrue_vars() {
+
+  local current_vars
+  local latest_vars
+  local cmake_vars
+
+  read current_vars <<< $(
+    set 2>/dev/null | while read a
+      do [[ $a == *=* ]] || break
+        echo -n "${a:+ }${a/=*}"
+      done
+  )
+
+  # find the symmetric difference of the two var sets (outset and current)
+  read latest_vars <<< $(
+    echo $BODEGA_VARLIST_OUTSET ${current_vars} | tr ' ' '\n' | sort | uniq -u | tr '\n' ' '
+  )
+
+  # isolate new vars that serve as cmake definitions
+  read cmake_vars <<< $(
+    echo ${latest_vars} | tr ' ' '\n' | grep "^CMAKE_*" | tr '\n' ' '
+  )
+
+  BODEGA_VARLIST_CMAKE_DEFINITIONS="${cmake_vars}"
+}
+
+
+_deflist_render_cmdline() {
+
+  read cmake_defs <<< $(
+  echo $BODEGA_VARLIST_CMAKE_DEFINITIONS | tr ' ' '\n' | while read a
+    do [[ -n $a ]] || break
+      echo -n "${a:+ }-D${a}=${!a}"
+    done
+    echo
+  )
+
+  BODEGA_CMDLINE_CMAKE_DEFINITIONS="${cmake_defs}"
+}
+
+
+#_cmfkit_denote_varlist_outset
+#_cmfkit_uptake_varlist_outset
+#_cmfkit_accrue_varlist_cmake_definitions
+#_cmfkit_render_cmdline_cmake_definitions
+
+
+#_init
+
+#CMFKIT_VARLIST_OUTSET
+#CMFKIT_VARLIST_CMAKE_DEFINITIONS
+#CMFKIT_CMDLINE_CMAKE_DEFINITIONS
+
+
+DEFLIST_VARS_OUTSET
+DEFLIST_VARS
+DEFLIST_CMDLINE
+
+
