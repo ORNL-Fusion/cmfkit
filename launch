@@ -1,0 +1,30 @@
+#!/bin/bash
+
+init() {
+
+  local readonly outsetdir="$( pwd -P )"
+  local readonly cmfkitdir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+  local rc
+
+  cd $(mktemp -d) || return 1
+
+  mkdir -p ./cmfkit_merge
+
+  cp -r ${outsetdir}/.cmfkit/* ./cmfkit_merge
+
+  mkdir -p ./cmfkit_merge/scenario
+  mkdir -p ./cmfkit_merge/testbank
+
+  cp -r ${cmfkitdir}/scenario/* ./cmfkit_merge/scenario
+  cp -r ${cmfkitdir}/testbank/* ./cmfkit_merge/testbank
+
+  echo; echo "${PWD}"; tree ; echo; echo
+
+  cd -
+
+  [[ ${OLDPWD} != ${outsetdir} ]] && rm -rf ${OLDPWD}
+
+}
+
+init
+
