@@ -1,14 +1,4 @@
-
-
-_init() {
-
-  local readonly uniq_id=$(( $RANDOM % 10000 + 40000 ))
-
-  CMFKIT_${uniq_id}_VARLIST_OUTSET=''
-  CMFKIT_${uniq_id}_VARLIST_CMAKE_DEFINITIONS=''
-  CMFKIT_${uniq_id}_CMDLINE_CMAKE_DEFINITIONS=''
-}
-
+#!/bin/bash
 
 _deflist_purge() {
 

@@ -1,0 +1,49 @@
+#!/bin/bash
+
+
+_readybake_yield_image() {
+
+  echo
+}
+
+
+_readybake_buildenv() {
+
+  local readonly dugout_dir="$1"
+
+  local readonly uniq_id=$(( $RANDOM % 10000 + 40000 ))
+  local readonly readybake_image="cmfkit_readybake:latest"
+
+  local container_id
+
+  read container_id <<< $(
+    docker create --interactive --tty ${readybake_image}
+  )
+
+  [[ -n ${container_id} ]] || return 1
+
+  docker cp ${dugout_dir} ${container_id}
+}
+
+
+_readybake_build() {
+
+  echo
+}
+
+
+
+
+CMFKIT_READYBAKE_CONTAINER_ID=''
+
+
+
+_init() {
+
+  local readonly uniq_id=$(( $RANDOM % 10000 + 40000 ))
+
+  CMFKIT_${uniq_id}_VARLIST_OUTSET=''
+  CMFKIT_${uniq_id}_VARLIST_CMAKE_DEFINITIONS=''
+  CMFKIT_${uniq_id}_CMDLINE_CMAKE_DEFINITIONS=''
+}
+
