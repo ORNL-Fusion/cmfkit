@@ -100,13 +100,13 @@ CMFKIT_READYBAKE_BASE_IMAGE='alpine:3.14.2'
   && [[ $CMFKIT_PLATFORM =~ autoselect|readybake ]] \
   && CMFKIT_PLATFORM="readybake"
 
-[[ $CMFKIT_PLATFORM =~ readybake ]] \
-  && (    _readybake_match_build_path "$CMFKIT_READYBAKE_BASE_IMAGE" \
-       || _error_fatal "unable to locate build path for $CMFKIT_READYBAKE_BASE_IMAGE" )
+[[ $CMFKIT_PLATFORM =~ readybake ]]  \
+  && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_BASE_IMAGE" \
+  ; [[ $? -eq 0 ]] || _error_fatal "unable to isolate Dockerfile for $CMFKIT_READYBAKE_BASE_IMAGE"
 
-[[ $CMFKIT_PLATFORM =~ readybake ]] \
-  || _readybake_yield_image \
-  || _error_fatal "_readybake_yield_image() failed" \
+[[ $CMFKIT_PLATFORM =~ readybake ]]  \
+  && _readybake_yield_image          \
+  ; [[ $? -eq 0 ]] || _error_fatal "_readybake_yield_image() failed"
 
 
 

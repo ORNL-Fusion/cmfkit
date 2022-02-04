@@ -11,7 +11,13 @@ _debug_dumpvars() {
       done
   )
 
+  echo "."
+  echo "."
+  echo "cmfkit >> [Debug] << _dumpvars()"
+  echo "."
   echo "${current_vars}" | tr ' ' '\n' | sort
+  echo "."
+  echo "."
 }
 
 _debug() {
@@ -19,7 +25,7 @@ _debug() {
   local readonly msg="$1"
 
   echo "."
-  echo "cmfkits >> [Debug] << ${msg}"
+  echo "cmfkit >> [Debug] << ${msg}"
   echo "."
 }
 
