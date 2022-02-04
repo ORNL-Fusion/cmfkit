@@ -29,7 +29,7 @@ _dugout_init() {
   cp -r ${cmfkitdir}/scenario/* ./.cmfkit/scenario
   cp -r ${cmfkitdir}/testbank/* ./.cmfkit/testbank
 
-  echo; echo "${PWD}"; #tree ; echo; echo
+  echo; echo "${PWD}"
 
   CMFKIT_DUGOUT_DIR="${PWD}"
 
