@@ -1,6 +1,38 @@
 #!/bin/bash
 
 
+_batchrun() {
+
+  local readonly verb="$1"
+  local manifest
+
+  cd ${BASH_SOURCE[0]%/*}
+
+  read manifest <<< $(
+    find . -mindepth 2  \
+           -maxdepth 2  \
+           -type f      \
+           -path "./_*/${verb}"
+  )
+
+  echo "${manifest}" \
+    | xargs -n1 /bin/bash -c 'cd ${1%/*} && ./${1##*/}' _
+
+  cd - >/dev/null
+}
+
+
+_readybake_match_build_path() {
+
+  local readonly base_image="$1"
+
+
+  echo FROM $base_image
+
+  return 0
+}
+
+
 _readybake_yield_image() {
 
   echo
@@ -46,4 +78,5 @@ _init() {
   CMFKIT_${uniq_id}_VARLIST_CMAKE_DEFINITIONS=''
   CMFKIT_${uniq_id}_CMDLINE_CMAKE_DEFINITIONS=''
 }
+
 

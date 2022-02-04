@@ -81,6 +81,7 @@ CMFKIT_DUGOUT_DIR=''
 
 _preflight
 
+. $CMFKIT_SOURCE_DIR/mod_common
 . $CMFKIT_SOURCE_DIR/mod_deflist
 . $CMFKIT_SOURCE_DIR/mod_readybake
 
@@ -92,18 +93,27 @@ echo $CMFKIT_DUGOUT_DIR
 CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-autoselect}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
 
+CMFKIT_READYBAKE_BUILD_PATH=''
+CMFKIT_READYBAKE_BASE_IMAGE='alpine:3.14.2'
 
-[[ $CMFKIT_PLATFORM =~ autoselect|readybake ]] \
-  && [[ -n "$CMFKIT_READYBAKE_BASE_IMAGE" ]] \
+[[ -n "$CMFKIT_READYBAKE_BASE_IMAGE" ]] \
+  && [[ $CMFKIT_PLATFORM =~ autoselect|readybake ]] \
   && CMFKIT_PLATFORM="readybake"
 
+[[ $CMFKIT_PLATFORM =~ readybake ]] \
+  && (    _readybake_match_build_path "$CMFKIT_READYBAKE_BASE_IMAGE" \
+       || _error_fatal "unable to locate build path for $CMFKIT_READYBAKE_BASE_IMAGE" )
 
-  && _readybake_path_locate || _error_fatal "_readybake_path_locate() failed" \
-  && _readybake_yield_image || _error_fatal "_readybake_yield_image() failed" \
-  && _readybake_yield_image || _error_fatal "_readybake_yield_image() failed" \
+[[ $CMFKIT_PLATFORM =~ readybake ]] \
+  || _readybake_yield_image \
+  || _error_fatal "_readybake_yield_image() failed" \
 
 
 
+
+echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
+
+rm -rf $CMFKIT_DUGOUT_DIR
 
 
 #[[ -z "$1" ]] && "__launch"
