@@ -97,6 +97,8 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
 
 CMFKIT_READYBAKE_BUILD_PATH=''
 
+echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
+
 
 [[ -n "$CMFKIT_READYBAKE_BASE_IMAGE" ]] \
   && [[ $CMFKIT_PLATFORM =~ autoselect|readybake ]] \
@@ -113,7 +115,7 @@ CMFKIT_READYBAKE_BUILD_PATH=''
 
 
 
-echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
+
 
 rm -rf $CMFKIT_DUGOUT_DIR
 
