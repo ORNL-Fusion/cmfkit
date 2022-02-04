@@ -36,8 +36,6 @@ _readybake_isolate_buildpath() {
       | wc -l
   )
 
-  echo $match_count
-
   [[ ${match_count} -eq 1 ]] || return 1
 
   read path_dockerfile <<< $(
@@ -46,9 +44,7 @@ _readybake_isolate_buildpath() {
         "^FROM ${base_image}" $CMFKIT_DUGOUT_DIR/platform/* \
   )
 
-  echo ${path_dockerfile}
-
-  CMFKIT_READYBAKE_BUILD_PATH="${path_dockerfile}"
+  CMFKIT_READYBAKE_BUILD_PATH="${path_dockerfile%/*}"
 }
 
 
