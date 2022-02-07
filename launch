@@ -105,6 +105,7 @@ echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
   && CMFKIT_PLATFORM="readybake"
 
 [[ $CMFKIT_PLATFORM =~ readybake ]]  \
+  && _debug "line 108, checkpoint"
   && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_BASE_IMAGE" \
   ; [[ $? -eq 0 ]] || _error_fatal "unable to isolate Dockerfile for $CMFKIT_READYBAKE_BASE_IMAGE"
 
