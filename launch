@@ -48,7 +48,7 @@ _platform_autodetect() {
 
 _platform_autoselect() {
 
-  CMFKIT_READYBAKE
+  echo "invoke _platform_autoselect()"
 }
 
 
@@ -91,27 +91,26 @@ echo $CMFKIT_DUGOUT_DIR
 
 
 
-CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-autoselect}"
+CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
-#CMFKIT_READYBAKE_BASE_IMAGE="${CMFKIT_READYBAKE_BASE_IMAGE:-}"
+#CMFKIT_READYBAKE_IMAGE_BASE="${CMFKIT_READYBAKE_IMAGE_BASE:-}"
 
 CMFKIT_READYBAKE_BUILD_PATH=''
 
 echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
 
-
 [[ -n "$CMFKIT_READYBAKE_BASE_IMAGE" ]] \
-  && [[ $CMFKIT_PLATFORM =~ autoselect|readybake ]] \
-  && CMFKIT_PLATFORM="readybake"
+  && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_BASE_IMAGE"
 
-[[ $CMFKIT_PLATFORM =~ readybake ]]  \
-  && _debug "line 108, checkpoint"   \
-  && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_BASE_IMAGE" \
-  ; [[ $? -eq 0 ]] || _error_fatal "unable to isolate Dockerfile for $CMFKIT_READYBAKE_BASE_IMAGE"
+[[ $CMFKIT_PLATFORM =~ readybake ]] \
+  && [[ -z "$CMFKIT_READYBAKE_BUILD_PATH" ]] \
+  && _error_fatal "unable to isolate Dockerfile for $CMFKIT_READYBAKE_BASE_IMAGE"
 
-[[ $CMFKIT_PLATFORM =~ readybake ]]  \
-  && _readybake_yield_image          \
-  ; [[ $? -eq 0 ]] || _error_fatal "_readybake_yield_image() failed"
+[[ $CMFKIT_PLATFORM =~ readybake ]]  && _readybake_yield_image
+[[ -z "$CMFKIT_READYBAKE_IMAGE"  ]]  && _error_fatal "unable to yield image"
+
+[[ $CMFKIT_PLATFORM =~ unknown ]]  && _platform_autoselect
+[[ $CMFKIT_PLATFORM =~ unknown ]]  && _error_fatal "unable to select platform"
 
 
 
