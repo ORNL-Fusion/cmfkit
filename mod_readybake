@@ -79,19 +79,6 @@ _readybake_build() {
 }
 
 
-
 CMFKIT_READYBAKE_BUILD_PATH=''
 CMFKIT_READYBAKE_CONTAINER_ID=''
-
-
-
-_init() {
-
-  local readonly uniq_id=$(( $RANDOM % 10000 + 40000 ))
-
-  CMFKIT_${uniq_id}_VARLIST_OUTSET=''
-  CMFKIT_${uniq_id}_VARLIST_CMAKE_DEFINITIONS=''
-  CMFKIT_${uniq_id}_CMDLINE_CMAKE_DEFINITIONS=''
-}
-
 
