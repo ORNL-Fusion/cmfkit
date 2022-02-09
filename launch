@@ -40,17 +40,6 @@ _dugout_init() {
 
 
 
-_platform_autodetect() {
-
-  echo
-}
-
-
-_platform_autoselect() {
-
-  echo "invoke _platform_autoselect()"
-}
-
 
 __launch_one() {
 
@@ -71,9 +60,7 @@ CMFKIT_SOURCE_DIR=''
 CMFKIT_OUTSET_DIR=''
 CMFKIT_DUGOUT_DIR=''
 
-# CMFKIT_CONTAINER_BASE_IMAGE
-
-# CMFKIT_READYBAKE_BASE_IMAGE
+# CMFKIT_READYBAKE_IMAGE_SEED
 # CMFKIT_PLATFORM [ autoselect nersc github_vm readybake ]
 # CMFKIT_SCENARIO [ all default none zilch ]
 
@@ -83,6 +70,7 @@ _preflight
 
 . $CMFKIT_SOURCE_DIR/mod_common
 . $CMFKIT_SOURCE_DIR/mod_deflist
+. $CMFKIT_SOURCE_DIR/mod_platform
 . $CMFKIT_SOURCE_DIR/mod_readybake
 
 _dugout_init
@@ -90,24 +78,27 @@ _dugout_init
 echo $CMFKIT_DUGOUT_DIR
 
 
+[[ -v CMFKIT_PLATFORM              ]]
+[[ -v CMFKIT_SCENARIO              ]]
+[[ -v CMFKIT_READYBAKE_IMAGE_SEED  ]]
 
 CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
-#CMFKIT_READYBAKE_IMAGE_BASE="${CMFKIT_READYBAKE_IMAGE_BASE:-}"
+
 
 CMFKIT_READYBAKE_BUILD_PATH=''
 
 echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
 
-[[ -n "$CMFKIT_READYBAKE_BASE_IMAGE" ]] \
-  && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_BASE_IMAGE"
+[[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] \
+  && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_IMAGE_SEED"
 
 [[ $CMFKIT_PLATFORM =~ readybake ]] \
   && [[ -z "$CMFKIT_READYBAKE_BUILD_PATH" ]] \
-  && _error_fatal "unable to isolate Dockerfile for $CMFKIT_READYBAKE_BASE_IMAGE"
+  && _error_fatal "unable to isolate Dockerfile for $CMFKIT_READYBAKE_SEED_IMAGE"
 
 [[ $CMFKIT_PLATFORM =~ readybake ]]  && _readybake_yield_image
-[[ -z "$CMFKIT_READYBAKE_IMAGE"  ]]  && _error_fatal "unable to yield image"
+[[ -z "$CMFKIT_READYBAKE_IMAGE"  ]]  && _error_fatal "unable to yield image: ${CMFKIT_READYBAKE_BUILD_PATH##*/}"
 
 [[ $CMFKIT_PLATFORM =~ unknown ]]  && _platform_autoselect
 [[ $CMFKIT_PLATFORM =~ unknown ]]  && _error_fatal "unable to select platform"

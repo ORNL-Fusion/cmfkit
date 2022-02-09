@@ -1,0 +1,13 @@
+#!/bin/bash
+
+_platform_autodetect() {
+
+  echo
+}
+
+
+_platform_autoselect() {
+
+  echo "invoke _platform_autoselect()"
+}
+
