@@ -84,8 +84,8 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
 
 
 echo; echo
-_debug_dumpvars | grep "CMFKIT_"
-_debug_dumpvars | grep "CMAKE_"
+_debug_dumpvars | grep "^CMFKIT_"
+_debug_dumpvars | grep "^CMAKE_"
 echo; echo
 
 
@@ -104,12 +104,30 @@ echo; echo
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _error_fatal "unable to select platform"
 
+
+# establish list of variables defined in a pre-scope context
+_deflist_denote_outset
+
+
 [[ $CMFKIT_PLATFORM =~ readybake ]] \
   && _debug "placeholder, readybake execute build"
   # replicate current env inside docker container and execute
 
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
   && . $CMFKIT_DUGOUT_DIR/.cmfkit/platform/$CMFKIT_PLATFORM/setup
+
+
+_debug "checkpoint 12"
+
+echo; echo
+_debug_dumpvars | grep "^CMAKE_"
+echo; echo
+
+_debug "checkpoint 13"
+
+# commit outstanding CMake def variables to the final roster
+_deflist_accrue_vars
+
 
 echo
 tree $CMFKIT_DUGOUT_DIR/.cmfkit
