@@ -83,7 +83,11 @@ CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
 
 
-echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
+echo; echo
+_debug_dumpvars | grep "CMFKIT_"
+_debug_dumpvars | grep "CMAKE_"
+echo; echo
+
 
 [[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] \
   && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_IMAGE_SEED"
@@ -100,9 +104,16 @@ echo; echo; _debug_dumpvars | grep "CMFKIT_" ; echo; echo
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _error_fatal "unable to select platform"
 
+[[ $CMFKIT_PLATFORM =~ readybake ]] \
+  && _debug "placeholder, readybake execute build"
+  # replicate current env inside docker container and execute
 
+[[ ! $CMFKIT_PLATFORM =~ readybake ]] \
+  && . $CMFKIT_DUGOUT_DIR/.cmfkit/platform/$CMFKIT_PLATFORM/setup
 
-
+echo
+tree $CMFKIT_DUGOUT_DIR/.cmfkit
+echo
 
 
 rm -rf $CMFKIT_DUGOUT_DIR
