@@ -32,7 +32,7 @@ _readybake_isolate_buildpath() {
   read match_count <<< $(
     grep  --recursive \
           --files-with-matches \
-        "^FROM ${base_image}" $CMFKIT_DUGOUT_DIR/platform/* \
+        "^FROM ${base_image}" $CMFKIT_DUGOUT_DIR/.cmfkit/platform/readybake* \
       | wc -l
   )
 
@@ -41,7 +41,7 @@ _readybake_isolate_buildpath() {
   read path_dockerfile <<< $(
     grep  --recursive \
           --files-with-matches \
-        "^FROM ${base_image}" $CMFKIT_DUGOUT_DIR/platform/* \
+        "^FROM ${base_image}" $CMFKIT_DUGOUT_DIR/.cmfkit/platform/readybake* \
   )
 
   CMFKIT_READYBAKE_BUILD_PATH="${path_dockerfile%/*}"
