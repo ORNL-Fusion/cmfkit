@@ -58,7 +58,6 @@ _readybake_buildenv() {
 
   local readonly dugout_dir="$1"
 
-  local readonly uniq_id=$(( $RANDOM % 10000 + 40000 ))
   local readonly readybake_image="cmfkit_readybake:latest"
 
   local container_id
