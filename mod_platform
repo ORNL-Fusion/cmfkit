@@ -1,5 +1,36 @@
 #!/bin/bash
 
+_hw_check() {
+
+  local cpu_arch
+  local cpu_count
+
+  read cpu_arch   <<< $( uname -p )
+  read cpu_count  <<< $( getconf _NPROCESSORS_ONLN )
+
+  [[ ${cpu_arch} =~ ${1,,} ]] \
+    && [[ ${cpu_count} =~ ${2,,} ]]
+}
+
+
+_os_check_linux() {
+
+  [[ -f /etc/os-release ]] && . /etc/os-release     \
+    && [[ ${1,,} =~ ${ID}${ID:+|}${ID_LIKE// /|} ]]  \
+    && [[ ${VERSION_ID} =~ ${2,,} ]]                  \
+    && [[ ${CPE_NAME}   =~ ${3,,} ]]                   \
+    && return 0
+
+  return 1
+}
+
+
+_os_check_macos() {
+
+  echo
+}
+
+
 _platform_autodetect() {
 
   echo
@@ -8,6 +39,6 @@ _platform_autodetect() {
 
 _platform_autoselect() {
 
-  echo "invoke _platform_autoselect()"
+  _debug "_platform_autoselect() $(pwd)"
 }
 
