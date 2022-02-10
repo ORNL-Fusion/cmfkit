@@ -43,8 +43,8 @@ _platform_autoselect() {
 
   _debug "_platform_autoselect() start"
 
-  [[ -v   CMFKIT_DUGOUT_DIR   ]] | return 1
-  [[ -z "$CMFKIT_DUGOUT_DIR"  ]] | return 1
+  [[ -v   CMFKIT_DUGOUT_DIR   ]] || return 1
+  [[ -z "$CMFKIT_DUGOUT_DIR"  ]] || return 1
 
   cd $CMFKIT_DUGOUT_DIR/platform
 
