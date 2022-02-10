@@ -5,3 +5,7 @@ _debug "setup macos latest"
 
 CMAKE_Fortran_COMPILER=/usr/local/opt/gfortran/bin/gfortran
 
+
+# list of CMake definition variables to import from existing environment
+_deflist_uptake_outset CMAKE_BUILD_TYPE
+
