@@ -2,5 +2,5 @@
 
 CMAKE_Fortran_COMPILER=/usr/local/opt/gfortran/bin/gfortran
 
-brew install open-mpi
+brew install hdf5 open-mpi
 
