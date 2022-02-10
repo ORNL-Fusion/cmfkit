@@ -109,10 +109,13 @@ _deflist_denote_outset
   # replicate current env inside docker container and execute
 
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
-  && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup
+  && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup \
+  && _deflist_accrue_vars
 
-# commit outstanding CMake def variables to the final roster
-_deflist_accrue_vars
+. $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO && __build \
+  || _error "build failure: scenario/$CMFKIT_SCENARIO on $CMFKIT_PLATFORM"
+
+rm -rf $CMFKIT_DUGOUT_DIR
 
 
 _debug "checkpoint 12"
@@ -136,9 +139,6 @@ echo
 echo
 #tree $CMFKIT_DUGOUT_DIR
 echo
-
-
-rm -rf $CMFKIT_DUGOUT_DIR
 
 
 #[[ -z "$1" ]] && "__launch"
