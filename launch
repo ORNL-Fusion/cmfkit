@@ -75,9 +75,9 @@ _preflight
 
 _dugout_init
 
-[[ -v CMFKIT_PLATFORM              ]]
-[[ -v CMFKIT_SCENARIO              ]]
-[[ -v CMFKIT_READYBAKE_IMAGE_SEED  ]]
+[[ -v CMFKIT_PLATFORM              ]] || true
+[[ -v CMFKIT_SCENARIO              ]] || true
+[[ -v CMFKIT_READYBAKE_IMAGE_SEED  ]] || true
 
 CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
