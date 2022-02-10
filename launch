@@ -18,8 +18,8 @@ _dugout_init() {
 
   #mkdir -p ./cmfkit_coalesce
 
-  cp -r ${outsetdir}/* .
-  #cp -r ${outsetdir}/.cmfkit/* ./cmfkit_coalesce
+  #cp -r ${outsetdir}/* .
+  cp -r ${outsetdir}/.cmfkit .
 
   mkdir -p ./.cmfkit/platform
   mkdir -p ./.cmfkit/scenario
@@ -31,7 +31,7 @@ _dugout_init() {
 
   echo; echo "${PWD}"
 
-  CMFKIT_DUGOUT_DIR="${PWD}"
+  CMFKIT_DUGOUT_DIR="${PWD}/.cmfkit"
 
   cd - >/dev/null
 
@@ -83,11 +83,6 @@ CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
 
 
-echo; echo
-_debug_dumpvars | grep "^CMFKIT_"
-_debug_dumpvars | grep "^CMAKE_"
-echo; echo
-
 
 [[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] \
   && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_IMAGE_SEED"
@@ -114,23 +109,32 @@ _deflist_denote_outset
   # replicate current env inside docker container and execute
 
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
-  && . $CMFKIT_DUGOUT_DIR/.cmfkit/platform/$CMFKIT_PLATFORM/setup
-
-
-_debug "checkpoint 12"
-
-echo; echo
-_debug_dumpvars | grep "^CMAKE_"
-echo; echo
-
-_debug "checkpoint 13"
+  && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup
 
 # commit outstanding CMake def variables to the final roster
 _deflist_accrue_vars
 
 
+_debug "checkpoint 12"
+
+echo 
+echo ${CMFKIT_VARLIST_OUTSET}             | tr ' ' '\n' | grep "^CMAKE_"
+echo ${CMFKIT_VARLIST_CMAKE_DEFINITIONS}  | tr ' ' '\n' | grep "^CMAKE_"
 echo
-tree $CMFKIT_DUGOUT_DIR/.cmfkit
+_debug_dumpvars | grep "^CMFKIT_"
+echo
+_debug_dumpvars | grep "^CMAKE_"
+
+_debug "checkpoint 13"
+
+# commit outstanding CMake def variables to the final roster
+#_deflist_accrue_vars
+
+
+echo
+#ls -la $CMFKIT_DUGOUT_DIR
+echo
+#tree $CMFKIT_DUGOUT_DIR
 echo
 
 
