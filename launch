@@ -118,29 +118,6 @@ _deflist_denote_outset
 rm -rf $CMFKIT_DUGOUT_DIR
 
 
-_debug "checkpoint 12"
-
-echo 
-echo ${CMFKIT_VARLIST_OUTSET}             | tr ' ' '\n' | grep "^CMAKE_"
-echo ${CMFKIT_VARLIST_CMAKE_DEFINITIONS}  | tr ' ' '\n' | grep "^CMAKE_"
-echo
-_debug_dumpvars | grep "^CMFKIT_"
-echo
-_debug_dumpvars | grep "^CMAKE_"
-
-_debug "checkpoint 13"
-
-# commit outstanding CMake def variables to the final roster
-#_deflist_accrue_vars
-
-
-echo
-#ls -la $CMFKIT_DUGOUT_DIR
-echo
-#tree $CMFKIT_DUGOUT_DIR
-echo
-
-
 #[[ -z "$1" ]] && "__launch"
 #[[ -z "$1" ]] || "__launch_$1" "$@"
 
