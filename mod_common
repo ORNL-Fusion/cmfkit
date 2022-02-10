@@ -2,9 +2,9 @@
 
 _debug_dumpvars() {
 
-  local current_vars
+  local shell_vars
 
-  read current_vars <<< $(
+  read shell_vars <<< $(
     set 2>/dev/null | while read a
       do [[ $a == *=* ]] || break
         echo -n "${a:+ }${a}"
@@ -15,7 +15,7 @@ _debug_dumpvars() {
   echo "."
   echo "cmfkit >> [Debug] << _dumpvars()"
   echo "."
-  echo "${current_vars}" | tr ' ' '\n' | sort
+  echo "${shell_vars}" | tr ' ' '\n' | sort
   echo "."
   echo "."
 }
