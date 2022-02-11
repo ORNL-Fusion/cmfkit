@@ -6,6 +6,7 @@ __build() {
   # list of CMake definition variables to import from existing environment
   _deflist_uptake_outset CMAKE_BUILD_TYPE
 
+  # commit outstanding CMake def variables to the final roster
   _deflist_accrue_vars
 
   # convert the CMake def final roster to CMake cmdline form
@@ -23,6 +24,6 @@ __build() {
 
 __test() {
 
-  echo
+  cd ./build && make test
 }
 
