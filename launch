@@ -82,7 +82,7 @@ _deflist_denote_outset
 #[[ -v CMFKIT_READYBAKE_IMAGE_SEED  ]] || echo
 
 CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
-CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-default}"
+CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
 
 [[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] \
   && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_IMAGE_SEED"
