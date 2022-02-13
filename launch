@@ -65,7 +65,7 @@ __launch_build() {
 
 __launch_test() {
 
-  . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO && __build \
+  . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO && __test \
     || _error "test failure: scenario/$CMFKIT_SCENARIO on $CMFKIT_PLATFORM"
 }
 
@@ -99,17 +99,10 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _error_fatal "unable to select platform"
 
-__launch_setup
-
-__launch_build
-
-#__launch_test
+[[ -z "$1" ]] && "__launch"
+[[ -z "$1" ]] || "__launch_$1" "$@"
 
 rm -rf $CMFKIT_DUGOUT_DIR
-
-
-#[[ -z "$1" ]] && "__launch"
-#[[ -z "$1" ]] || "__launch_$1" "$@"
 
 #_readybake_yield_image
 #_readybake_buildenv
