@@ -12,10 +12,8 @@ __build() {
   # convert the CMake def final roster to CMake cmdline form
   _deflist_render_cmdline
 
-  echo; echo; _debug "print CMake definitions - BEGIN"
-  echo; echo $CMFKIT_CMDLINE_CMAKE_DEFINITIONS | tr ' ' '\n'
-  echo; echo; _debug "print CMake definitions - END"
-  echo; echo
+  # output the final CMake cmdline definitions
+  _deflist_print_cmdline
 
   mkdir -p ./build && cd $_
   cmake $CMFKIT_CMDLINE_CMAKE_DEFINITIONS .. && make

@@ -85,6 +85,18 @@ _deflist_render_cmdline() {
 }
 
 
+_deflist_print_cmdline() {
+
+  echo "."
+  echo "."
+  echo "cmfkit >> [Info] << cmdline CMake definitions"
+  echo -n "."
+  echo " $CMFKIT_CMDLINE_CMAKE_DEFINITIONS" | sed 's/ /\n  /g'
+  echo "."
+  echo "."
+  echo; echo
+}
+
 #_cmfkit_denote_varlist_outset
 #_cmfkit_uptake_varlist_outset
 #_cmfkit_accrue_varlist_cmake_definitions
