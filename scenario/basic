@@ -3,6 +3,10 @@
 
 __build() {
 
+
+  # set default cmake build type: 'Release'
+  CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}"
+
   # list of CMake definition variables to import from existing environment
   _deflist_uptake_outset CMAKE_BUILD_TYPE
 
