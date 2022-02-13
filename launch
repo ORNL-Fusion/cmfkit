@@ -44,32 +44,6 @@ _dugout_init() {
 }
 
 
-__launch_setup() {
-
-  [[ $CMFKIT_PLATFORM =~ readybake ]] \
-    && _debug "placeholder, readybake execute build"
-    # replicate current env inside docker container and execute
-
-  [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
-    && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup \
-    && _deflist_accrue_vars
-}
-
-
-__launch_build() {
-
-  . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO && __build \
-    || _error "build failure: scenario/$CMFKIT_SCENARIO on $CMFKIT_PLATFORM"
-}
-
-
-__launch_test() {
-
-  . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO && __test \
-    || _error "test failure: scenario/$CMFKIT_SCENARIO on $CMFKIT_PLATFORM"
-}
-
-
 _preflight
 
 _dugout_init
@@ -99,10 +73,29 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _error_fatal "unable to select platform"
 
-[[ -z "$1" ]] && "__launch"
-[[ -z "$1" ]] || "__launch_$1" "$@"
+[[ $CMFKIT_PLATFORM =~ readybake ]] \
+  && _debug "placeholder, readybake execute build"
+  # replicate current env inside docker container and execute
+
+
+[[ ! $CMFKIT_PLATFORM =~ readybake ]] \
+  && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup \
+  && _deflist_accrue_vars
+
+[[ $1 =~ build|test ]] \
+  && . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO && "__$1" \
+    || _error "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'"
+
+[[ -z "$1" ]] \
+  && . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO \
+  && __build \
+  && __test
 
 rm -rf $CMFKIT_DUGOUT_DIR
+
+
+
+
 
 #_readybake_yield_image
 #_readybake_buildenv
