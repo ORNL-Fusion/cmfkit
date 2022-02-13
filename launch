@@ -24,7 +24,7 @@ _dugout_init() {
   #mkdir -p ./cmfkit_coalesce
 
   #cp -r ${outsetdir}/* .
-  cp -r ${outsetdir}/.cmfkit .
+  [[ -d ${outsetdir}/.cmfkit ]] && cp -r ${outsetdir}/.cmfkit .
 
   mkdir -p ./.cmfkit/platform
   mkdir -p ./.cmfkit/scenario
