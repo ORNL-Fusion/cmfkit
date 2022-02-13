@@ -44,6 +44,12 @@ _dugout_init() {
 }
 
 
+_dugout_demolish() {
+
+  rm -rf $CMFKIT_DUGOUT_DIR
+}
+
+
 _preflight
 
 _dugout_init
@@ -63,15 +69,19 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
 
 [[ $CMFKIT_PLATFORM =~ readybake ]] \
   && [[ -z "$CMFKIT_READYBAKE_BUILD_PATH" ]] \
+  && _dugout_demolish \
   && _error_fatal "unable to isolate Dockerfile for $CMFKIT_READYBAKE_IMAGE_SEED"
 
 [[ $CMFKIT_PLATFORM =~ readybake ]] && _readybake_yield_image
 [[ $CMFKIT_PLATFORM =~ readybake ]]  \
-  && [[ -z "$CMFKIT_READYBAKE_IMAGE"  ]] \
+  && [[ -z "$CMFKIT_READYBAKE_IMAGE" ]] \
+  && _dugout_demolish \
   && _error_fatal "unable to yield image: ${CMFKIT_READYBAKE_BUILD_PATH##*/}"
 
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
-[[ $CMFKIT_PLATFORM =~ unknown ]] && _error_fatal "unable to select platform"
+[[ $CMFKIT_PLATFORM =~ unknown ]] \
+  && _dugout_demolish \
+  && _error_fatal "unable to select platform"
 
 [[ $CMFKIT_PLATFORM =~ readybake ]] \
   && _debug "placeholder, readybake execute build"
@@ -91,8 +101,8 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
   && __build \
   && __test
 
-rm -rf $CMFKIT_DUGOUT_DIR
 
+_dugout_demolish
 
 
 
