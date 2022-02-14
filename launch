@@ -46,13 +46,15 @@ _dugout_init() {
 
 _dugout_demolish() {
 
-  rm -rf $CMFKIT_DUGOUT_DIR
+  [[ -d ${CMFKIT_DUGOUT_DIR%/*}/.cmfkit ]] \
+    && _debug "_dugout_demolish ${CMFKIT_DUGOUT_DIR%/*}"
+  #_debug "${CMFKIT_DUGOUT_DIR%/*}"
 }
 
 
 _preflight
 
-_dugout_init
+_dugout_init || _error_fatal "dugout creation failed"
 
 # establish list of variables defined in a pre-scope context
 _deflist_denote_outset
@@ -76,17 +78,19 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
 [[ $CMFKIT_PLATFORM =~ readybake ]]  \
   && [[ -z "$CMFKIT_READYBAKE_IMAGE" ]] \
   && _dugout_demolish \
-  && _error_fatal "unable to yield image: ${CMFKIT_READYBAKE_BUILD_PATH##*/}"
+  && _error_fatal "unable to yield image: ${CMFKIT_READYBAKE_BUILD_PATH##*/} '$CMFKIT_READYBAKE_IMAGE_SEED'"
 
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
 [[ $CMFKIT_PLATFORM =~ unknown ]] \
   && _dugout_demolish \
   && _error_fatal "unable to select platform"
 
-[[ $CMFKIT_PLATFORM =~ readybake ]] \
-  && _debug "placeholder, readybake execute build"
+[[ $CMFKIT_PLATFORM =~ readybake ]] && _readybake_buildenv
+[[ $CMFKIT_PLATFORM =~ readybake ]]  \
+  && [[ -z "$CMFKIT_READYBAKE_CONTAINER_ID" ]] \
+  && _dugout_demolish \
+  && _error_fatal "unable to create container from ${CMFKIT_READYBAKE_IMAGE}"
   # replicate current env inside docker container and execute
-
 
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
   && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup \

@@ -50,15 +50,30 @@ _readybake_isolate_buildpath() {
 
 _readybake_yield_image() {
 
-  echo
+  [[ -n "$CMFKIT_READYBAKE_BUILD_PATH" ]] || return 1
+
+  local readonly image_tag="cmfkit-${CMFKIT_READYBAKE_BUILD_PATH##*/}"
+
+  cd $CMFKIT_READYBAKE_BUILD_PATH
+
+  DOCKER_BUILDKIT=1 docker build --tag "${image_tag}" .
+  rc="$?"
+
+  cd - >/dev/null
+
+  [[ ${rc} -eq 0 ]] || return 1
+
+  CMFKIT_READYBAKE_IMAGE="${image_tag}:latest"
 }
 
 
 _readybake_buildenv() {
 
-  local readonly dugout_dir="$1"
+  [[ -n "$CMFKIT_READYBAKE_IMAGE" ]] || return 1
+  [[ -n "$CMFKIT_DUGOUT_DIR" ]] || return 1
 
-  local readonly readybake_image="cmfkit_readybake:latest"
+  local readonly readybake_image="$CMFKIT_READYBAKE_IMAGE"
+  local readonly dugout_dir="$CMFKIT_DUGOUT_DIR"
 
   local container_id
 
@@ -69,6 +84,8 @@ _readybake_buildenv() {
   [[ -n ${container_id} ]] || return 1
 
   docker cp ${dugout_dir} ${container_id}
+
+  CMFKIT_READYBAKE_CONTAINER_ID="${container_id}"
 }
 
 
