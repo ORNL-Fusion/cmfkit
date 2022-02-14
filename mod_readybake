@@ -1,27 +1,6 @@
 #!/bin/bash
 
 
-_batchrun() {
-
-  local readonly verb="$1"
-  local manifest
-
-  cd ${BASH_SOURCE[0]%/*}
-
-  read manifest <<< $(
-    find . -mindepth 2  \
-           -maxdepth 2  \
-           -type f      \
-           -path "./_*/${verb}"
-  )
-
-  echo "${manifest}" \
-    | xargs -n1 /bin/bash -c 'cd ${1%/*} && ./${1##*/}' _
-
-  cd - >/dev/null
-}
-
-
 _readybake_isolate_buildpath() {
 
   local readonly base_image="$1"
