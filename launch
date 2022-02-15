@@ -65,6 +65,14 @@ _deflist_denote_outset
 
 CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
+CMFKIT_SCENARIO_PHASE_SELECT="${1:-all}"
+
+[[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
+[[ $CMFKIT_PLATFORM =~ unknown ]] \
+  && _dugout_demolish \
+  && _error_fatal "unable to select platform"
+
+# ------------
 
 [[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] \
   && _readybake_isolate_buildpath "$CMFKIT_READYBAKE_IMAGE_SEED"
@@ -80,35 +88,46 @@ CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
   && _dugout_demolish \
   && _error_fatal "unable to yield image: ${CMFKIT_READYBAKE_BUILD_PATH##*/} '$CMFKIT_READYBAKE_IMAGE_SEED'"
 
-[[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
-[[ $CMFKIT_PLATFORM =~ unknown ]] \
-  && _dugout_demolish \
-  && _error_fatal "unable to select platform"
-
-[[ $CMFKIT_PLATFORM =~ readybake ]] && _readybake_buildenv
+[[ $CMFKIT_PLATFORM =~ readybake ]] && _readybake_init
 [[ $CMFKIT_PLATFORM =~ readybake ]]  \
   && [[ -z "$CMFKIT_READYBAKE_CONTAINER_ID" ]] \
   && _dugout_demolish \
   && _error_fatal "unable to create container from ${CMFKIT_READYBAKE_IMAGE}"
   # replicate current env inside docker container and execute
 
+[[ $CMFKIT_PLATFORM =~ readybake ]] \
+  && ( _readybake_exec || _error  "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+
+# ------------
+
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
   && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup \
   && _deflist_accrue_vars
 
-[[ $1 =~ build|test ]] \
-  && . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO && "__$1" \
-    || _error "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'"
+[[ ! $CMFKIT_PLATFORM =~ readybake ]] \
+  && . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO
 
-[[ -z "$1" ]] \
-  && . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO \
-  && __build \
-  && __test
+[[ ! $CMFKIT_PLATFORM =~ readybake ]] \
+  && [[ $CMFKIT_SCENARIO_PHASE_SELECT == all ]] \
+  && ( __build || _error  "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \
+  && ( __test  || _error   "test failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+
+[[ ! $CMFKIT_PLATFORM =~ readybake ]] \
+  && [[ $CMFKIT_SCENARIO_PHASE_SELECT =~ build|test ]] \
+  && ( "__$1"  || _error     "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+
+
+#[[ ! $CMFKIT_PLATFORM =~ readybake ]] && [[ -z "$1" ]] \
+#  && ( __build || _error  "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \
+#  && ( __test  || _error   "test failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+
+#[[ ! $CMFKIT_PLATFORM =~ readybake ]] && [[ $1 =~ build|test ]] \
+#  && ( "__$1"  || _error     "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
 
 
 _dugout_demolish
 
-
+# $1 is phase
 
 
 #_readybake_yield_image

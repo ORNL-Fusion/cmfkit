@@ -31,7 +31,7 @@ _readybake_yield_image() {
 
   [[ -n "$CMFKIT_READYBAKE_BUILD_PATH" ]] || return 1
 
-  local readonly image_tag="cmfkit-${CMFKIT_READYBAKE_BUILD_PATH##*/}"
+  local readonly image_tag="localhost:5000/${CMFKIT_READYBAKE_BUILD_PATH##*/}"
 
   cd $CMFKIT_READYBAKE_BUILD_PATH
 
@@ -40,35 +40,76 @@ _readybake_yield_image() {
 
   cd - >/dev/null
 
-  [[ ${rc} -eq 0 ]] || return 1
+  [[ ${rc} -eq 0 ]] || return "${rc}"
 
   CMFKIT_READYBAKE_IMAGE="${image_tag}:latest"
 }
 
 
-_readybake_buildenv() {
+_readybake_init() {
 
-  [[ -n "$CMFKIT_READYBAKE_IMAGE" ]] || return 1
-  [[ -n "$CMFKIT_DUGOUT_DIR" ]] || return 1
+  [[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] || return 1
+  [[ -n "$CMFKIT_READYBAKE_IMAGE"  ]] || return 1
+  [[ -n "$CMFKIT_DUGOUT_DIR"       ]] || return 1
+  [[ -n "$CMFKIT_SOURCE_DIR"       ]] || return 1
+  [[ -n "$CMFKIT_PLATFORM"         ]] || return 1
+  [[ -n "$CMFKIT_SCENARIO"         ]] || return 1
 
   local readonly readybake_image="$CMFKIT_READYBAKE_IMAGE"
   local readonly dugout_dir="$CMFKIT_DUGOUT_DIR"
+  local readonly source_dir="$CMFKIT_SOURCE_DIR"
 
   local container_id
 
   read container_id <<< $(
-    docker create --interactive --tty ${readybake_image}
+    docker create \
+        --interactive --tty \
+        --env CMFKIT_PLATFORM=$CMFKIT_PLATFORM \
+        --env CMFKIT_SCENARIO=$CMFKIT_SCENARIO \
+        --env CMFKIT_READYBAKE_IMAGE_SEED=$CMFKIT_READYBAKE_IMAGE_SEED \
+      ${readybake_image}
   )
+
+  #read container_id <<< $( docker create --interactive ${readybake_image} --workdir /var/cmfkit /bin/sh -c "./readybake_launch.sh" )
 
   [[ -n ${container_id} ]] || return 1
 
-  docker cp ${dugout_dir} ${container_id}
+  docker cp ${dugout_dir}/             ${container_id}:/var/cmfkit
+  docker cp ${source_dir}/mod_common   ${container_id}:/var/cmfkit
+  docker cp ${source_dir}/mod_deflist  ${container_id}:/var/cmfkit
+  
+
+  #_debug "_readybake_init() $(pwd -P)"
+
+  cat $CMFKIT_DUGOUT_DIR/readybake_launch.sh <<-__EOF__
+
+		#!/bin/bash
+
+		. ./mod_common
+		. ./mod_deflist
+		. ./scenario/\$CMFKIT_SCENARIO
+
+		[[ -z "\$1" ]] \
+		  && ( __build || _error "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \" )
+		  && ( __test  || _error  "test failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \" )
+
+	__EOF__
 
   CMFKIT_READYBAKE_CONTAINER_ID="${container_id}"
 }
 
 
-_readybake_build() {
+_readybake_exec() {
+
+  [[ -n "$CMFKIT_READYBAKE_CONTAINER_ID" ]] || return 1
+
+  docker start   $CMFKIT_READYBAKE_CONTAINER_ID
+
+  #docker exec --interactive $CMFKIT_READYBAKE_CONTAINER_ID /bin/sh -c "echo thinger" ; rc="$?"
+  docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
+
+  docker stop    $CMFKIT_READYBAKE_CONTAINER_ID
+  docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
 
   echo
 }
@@ -76,4 +117,5 @@ _readybake_build() {
 
 CMFKIT_READYBAKE_BUILD_PATH=''
 CMFKIT_READYBAKE_CONTAINER_ID=''
+CMFKIT_READYBAKE_INTERACTIVE="${CMFKIT_READYBAKE_INTERACTIVE:-false}"
 
