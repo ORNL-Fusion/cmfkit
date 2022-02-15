@@ -65,10 +65,8 @@ _readybake_init() {
   read container_id <<< $(
     docker create \
         --interactive --tty \
-        --env CMFKIT_SCENARIO=$CMFKIT_SCENARIO \
-        --env CMFKIT_READYBAKE_IMAGE_SEED=$CMFKIT_READYBAKE_IMAGE_SEED \
         --workdir /usr/local/src \
-      ${readybake_image} 
+      ${readybake_image} /bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
   )
 #/bin/sh -c "./readybake_launch.sh ${scenario_phase}"
   #read container_id <<< $( docker create --interactive ${readybake_image} --workdir /var/cmfkit /bin/sh -c "./readybake_launch.sh" )
@@ -81,26 +79,32 @@ _readybake_init() {
 
 	#!/bin/bash
 
+	cd /usr/local/cmfkit
+
 	. ./mod_common
 	. ./mod_deflist
-	. ./scenario/\$CMFKIT_SCENARIO
+	. ./scenario/$CMFKIT_SCENARIO
+
+	cd - >/dev/null
 
 	[[ -z "\$1" ]] \\
-	  && ( __build || _error "build failure: 'scenario/\$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \\
-	  && ( __test  || _error  "test failure: 'scenario/\$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+	  && ( __build || _error "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \\
+	  && ( __test  || _error  "test failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
 
 	[[ "\$1" =~ build|test ]] \\
-	  && ( "__\$1"  || _error  "\$1 failure: 'scenario/\$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+	  && ( "__\$1"  || _error  "\$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+
+	sleep 5
 
 	__EOF__
 
-  #chmod +x ${dugout_dir}/readybake_launch.sh
+  chmod +x ${dugout_dir}/readybake_launch.sh
 
-  #rm -rf ${dugout_dir}/platform
+  rm -rf ${dugout_dir}/platform
 
-  docker cp ${dugout_dir}/             ${container_id}:/var/cmfkit
-  docker cp ${source_dir}/mod_common   ${container_id}:/var/cmfkit
-  docker cp ${source_dir}/mod_deflist  ${container_id}:/var/cmfkit
+  docker cp ${dugout_dir}/             ${container_id}:/usr/local/cmfkit
+  docker cp ${source_dir}/mod_common   ${container_id}:/usr/local/cmfkit
+  docker cp ${source_dir}/mod_deflist  ${container_id}:/usr/local/cmfkit
 
   CMFKIT_READYBAKE_CONTAINER_ID="${container_id}"
 }
@@ -110,10 +114,14 @@ _readybake_exec() {
 
   [[ -n "$CMFKIT_READYBAKE_CONTAINER_ID" ]] || return 1
 
-  docker start   $CMFKIT_READYBAKE_CONTAINER_ID
+  docker start  --attach --interactive  $CMFKIT_READYBAKE_CONTAINER_ID
+
+  
 
   #docker exec --interactive $CMFKIT_READYBAKE_CONTAINER_ID /bin/sh -c "echo thinger" ; rc="$?"
-  docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
+  #docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
+
+  #sleep 5
 
   docker stop    $CMFKIT_READYBAKE_CONTAINER_ID
   docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
