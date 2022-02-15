@@ -67,7 +67,7 @@ _deflist_denote_outset
 
 CMFKIT_PLATFORM="${CMFKIT_PLATFORM:-unknown}"
 CMFKIT_SCENARIO="${CMFKIT_SCENARIO:-basic}"
-CMFKIT_SCENARIO_PHASE_SELECT="${1:-all}"
+CMFKIT_SCENARIO_PHASE_SELECT="$1"
 
 [[ $CMFKIT_PLATFORM =~ unknown ]] && _platform_autoselect
 [[ $CMFKIT_PLATFORM =~ unknown ]] \

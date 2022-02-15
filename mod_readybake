@@ -56,6 +56,7 @@ _readybake_init() {
   [[ -n "$CMFKIT_SCENARIO"         ]] || return 1
 
   local readonly readybake_image="$CMFKIT_READYBAKE_IMAGE"
+  local readonly scenario_phase="$CMFKIT_SCENARIO_PHASE_SELECT"
   local readonly dugout_dir="$CMFKIT_DUGOUT_DIR"
   local readonly source_dir="$CMFKIT_SOURCE_DIR"
 
@@ -66,17 +67,17 @@ _readybake_init() {
         --interactive --tty \
         --env CMFKIT_SCENARIO=$CMFKIT_SCENARIO \
         --env CMFKIT_READYBAKE_IMAGE_SEED=$CMFKIT_READYBAKE_IMAGE_SEED \
-        --workdir /var/cmfkit \
-      ${readybake_image}
+        --workdir /usr/local/src \
+      ${readybake_image} 
   )
-
+#/bin/sh -c "./readybake_launch.sh ${scenario_phase}"
   #read container_id <<< $( docker create --interactive ${readybake_image} --workdir /var/cmfkit /bin/sh -c "./readybake_launch.sh" )
 
   [[ -n ${container_id} ]] || return 1
 
   #_debug "_readybake_init() $(pwd -P)"
 
-  cat > ${dugout_dir}/readybake_launch <<-__EOF__
+  cat > ${dugout_dir}/readybake_launch.sh <<-__EOF__
 
 	#!/bin/bash
 
@@ -88,9 +89,14 @@ _readybake_init() {
 	  && ( __build || _error "build failure: 'scenario/\$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \\
 	  && ( __test  || _error  "test failure: 'scenario/\$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
 
+	[[ "\$1" =~ build|test ]] \\
+	  && ( "__\$1"  || _error  "\$1 failure: 'scenario/\$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+
 	__EOF__
 
-  rm -rf ${dugout_dir}/platform
+  #chmod +x ${dugout_dir}/readybake_launch.sh
+
+  #rm -rf ${dugout_dir}/platform
 
   docker cp ${dugout_dir}/             ${container_id}:/var/cmfkit
   docker cp ${source_dir}/mod_common   ${container_id}:/var/cmfkit
