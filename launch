@@ -46,9 +46,11 @@ _dugout_init() {
 
 _dugout_demolish() {
 
-  [[ -d ${CMFKIT_DUGOUT_DIR%/*}/.cmfkit ]] \
-    && _debug "_dugout_demolish ${CMFKIT_DUGOUT_DIR%/*}"
-  #_debug "${CMFKIT_DUGOUT_DIR%/*}"
+  local readonly dugout_parent="${CMFKIT_DUGOUT_DIR%/*}"
+
+  [[ -d ${dugout_parent}/.cmfkit ]] \
+    && [[ ${dugout_parent} =~ .+/tmp\..+ ]] \
+    && rm -rf ${dugout_parent}
 }
 
 
