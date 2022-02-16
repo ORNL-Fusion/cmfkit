@@ -51,6 +51,7 @@ _readybake_init() {
   [[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] || return 1
   [[ -n "$CMFKIT_READYBAKE_IMAGE"  ]] || return 1
   [[ -n "$CMFKIT_DUGOUT_DIR"       ]] || return 1
+  [[ -n "$CMFKIT_OUTSET_DIR"       ]] || return 1
   [[ -n "$CMFKIT_SOURCE_DIR"       ]] || return 1
   [[ -n "$CMFKIT_PLATFORM"         ]] || return 1
   [[ -n "$CMFKIT_SCENARIO"         ]] || return 1
@@ -58,6 +59,7 @@ _readybake_init() {
   local readonly readybake_image="$CMFKIT_READYBAKE_IMAGE"
   local readonly scenario_phase="$CMFKIT_SCENARIO_PHASE_SELECT"
   local readonly dugout_dir="$CMFKIT_DUGOUT_DIR"
+  local readonly outset_dir="$CMFKIT_OUTSET_DIR"
   local readonly source_dir="$CMFKIT_SOURCE_DIR"
 
   local container_id
@@ -102,6 +104,7 @@ _readybake_init() {
 
   rm -rf ${dugout_dir}/platform
 
+  docker cp ${outset_dir}/             ${container_id}:/usr/local/src
   docker cp ${dugout_dir}/             ${container_id}:/usr/local/cmfkit
   docker cp ${source_dir}/mod_common   ${container_id}:/usr/local/cmfkit
   docker cp ${source_dir}/mod_deflist  ${container_id}:/usr/local/cmfkit
