@@ -70,12 +70,7 @@ _readybake_init() {
         --workdir /usr/local/src \
       ${readybake_image} /bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
   )
-#/bin/sh -c "./readybake_launch.sh ${scenario_phase}"
-  #read container_id <<< $( docker create --interactive ${readybake_image} --workdir /var/cmfkit /bin/sh -c "./readybake_launch.sh" )
-
   [[ -n ${container_id} ]] || return 1
-
-  #_debug "_readybake_init() $(pwd -P)"
 
   cat > ${dugout_dir}/readybake_launch.sh <<-__EOF__
 
@@ -118,13 +113,6 @@ _readybake_exec() {
   [[ -n "$CMFKIT_READYBAKE_CONTAINER_ID" ]] || return 1
 
   docker start  --attach --interactive  $CMFKIT_READYBAKE_CONTAINER_ID
-
-  
-
-  #docker exec --interactive $CMFKIT_READYBAKE_CONTAINER_ID /bin/sh -c "echo thinger" ; rc="$?"
-  #docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
-
-  #sleep 5
 
   docker stop    $CMFKIT_READYBAKE_CONTAINER_ID
   docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
