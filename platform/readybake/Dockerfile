@@ -1,5 +1,5 @@
 
-FROM rikorose/gcc-cmake:gcc-10
+FROM rikorose/gcc-cmake:gcc-11
 
 RUN set -x \
   && apt-get update \
