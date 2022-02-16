@@ -87,8 +87,8 @@ _readybake_init() {
 
 	cd - >/dev/null
 
-  cd /usr/local/src
-  cd \$(ls -1) || _error_fatal "unable to locate project dir"
+	cd /usr/local/src
+	cd \$(ls -1) || _error_fatal "unable to locate project dir"
 
 	[[ -z "\$1" ]] \\
 	  && ( __build || _error "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \\
