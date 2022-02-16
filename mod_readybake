@@ -79,8 +79,6 @@ _readybake_init() {
 
 	#!/bin/bash
 
-  #sleep 2
-
 	cd /usr/local/cmfkit
 
 	. ./mod_common
@@ -88,6 +86,9 @@ _readybake_init() {
 	. ./scenario/$CMFKIT_SCENARIO
 
 	cd - >/dev/null
+
+  cd /usr/local/src
+  cd \$(ls -1) || _error_fatal "unable to locate project dir"
 
 	[[ -z "\$1" ]] \\
 	  && ( __build || _error "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \\
@@ -115,6 +116,8 @@ _readybake_init() {
 
 _readybake_exec() {
 
+  local readonly scenario_phase="$CMFKIT_SCENARIO_PHASE_SELECT"
+
   [[ -n "$CMFKIT_READYBAKE_CONTAINER_ID" ]] || return 1
 
   docker start   $CMFKIT_READYBAKE_CONTAINER_ID
@@ -123,7 +126,7 @@ _readybake_exec() {
       --interactive $CMFKIT_READYBAKE_CONTAINER_ID \
     /bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
 
-  #docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
+  docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
 
   docker stop    $CMFKIT_READYBAKE_CONTAINER_ID
   docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
