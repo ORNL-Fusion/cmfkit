@@ -68,13 +68,18 @@ _readybake_init() {
     docker create \
         --interactive --tty \
         --workdir /usr/local/src \
-      ${readybake_image} /bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
+      ${readybake_image}
   )
+
+  #/bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
+
   [[ -n ${container_id} ]] || return 1
 
   cat > ${dugout_dir}/readybake_launch.sh <<-__EOF__
 
 	#!/bin/bash
+
+  #sleep 2
 
 	cd /usr/local/cmfkit
 
@@ -91,7 +96,7 @@ _readybake_init() {
 	[[ "\$1" =~ build|test ]] \\
 	  && ( "__\$1"  || _error  "\$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
 
-	sleep 5
+	#sleep 5
 
 	__EOF__
 
@@ -112,7 +117,13 @@ _readybake_exec() {
 
   [[ -n "$CMFKIT_READYBAKE_CONTAINER_ID" ]] || return 1
 
-  docker start  --attach --interactive  $CMFKIT_READYBAKE_CONTAINER_ID
+  docker start   $CMFKIT_READYBAKE_CONTAINER_ID
+
+  docker exec \
+      --interactive $CMFKIT_READYBAKE_CONTAINER_ID \
+    /bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
+
+  #docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
 
   docker stop    $CMFKIT_READYBAKE_CONTAINER_ID
   docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
