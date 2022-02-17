@@ -79,8 +79,6 @@ _readybake_init() {
 
 	#!/bin/bash
 
-	apt-get install -y tree git
-
 	cd /usr/local/cmfkit
 
 	. ./mod_common
@@ -91,11 +89,6 @@ _readybake_init() {
 
 	cd /usr/local/src
 
-	ls -la
-	git status
-
-	tree /usr/local/cmfkit
-
 	cd \$(ls -1) || _error_fatal "unable to locate project dir"
 
 	[[ -z "\$1" ]] \\
@@ -105,17 +98,13 @@ _readybake_init() {
 	[[ "\$1" =~ build|test ]] \\
 	  && ( "__\$1"  || _error  "\$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
 
-	#sleep 5
-
 	__EOF__
 
   chmod +x ${dugout_dir}/readybake_launch.sh
 
   rm -rf ${dugout_dir}/platform
 
-  set -x
   docker cp ${outset_dir}/             ${container_id}:/usr/local/src
-  set +x
   docker cp ${dugout_dir}/             ${container_id}:/usr/local/cmfkit
   docker cp ${source_dir}/mod_common   ${container_id}:/usr/local/cmfkit
   docker cp ${source_dir}/mod_deflist  ${container_id}:/usr/local/cmfkit
