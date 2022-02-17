@@ -79,6 +79,8 @@ _readybake_init() {
 
 	#!/bin/bash
 
+	apt-get install -y tree git
+
 	cd /usr/local/cmfkit
 
 	. ./mod_common
@@ -88,6 +90,12 @@ _readybake_init() {
 	cd - >/dev/null
 
 	cd /usr/local/src
+
+	ls -la
+	git status
+
+	tree /usr/local/cmfkit
+
 	cd \$(ls -1) || _error_fatal "unable to locate project dir"
 
 	[[ -z "\$1" ]] \\
