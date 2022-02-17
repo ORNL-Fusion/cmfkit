@@ -126,7 +126,8 @@ _readybake_exec() {
       --interactive $CMFKIT_READYBAKE_CONTAINER_ID \
     /bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
 
-  #docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
+  [[ $CMFKIT_READYBAKE_INTERACTIVE =~ true ]] \
+    && docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
 
   docker stop    $CMFKIT_READYBAKE_CONTAINER_ID
   docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
