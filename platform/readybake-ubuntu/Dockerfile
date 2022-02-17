@@ -10,6 +10,8 @@ RUN set -x \
                 gfortran \
                 libnetcdf-dev \
                 libnetcdff-dev \
+                openmpi-common \
+                openmpi-bin \
                 cmake
 
 #ENV FC=gfortran
