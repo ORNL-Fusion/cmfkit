@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 _readybake_isolate_buildpath() {
 
   local readonly base_image="$1"
