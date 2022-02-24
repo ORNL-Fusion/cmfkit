@@ -99,13 +99,11 @@ __import || echo "cmfkit >> [Info] << scenario/$CMFKIT_SCENARIO __import() not p
   && [[ -z "$CMFKIT_READYBAKE_CONTAINER_ID" ]] \
   && _dugout_demolish \
   && _error_fatal "unable to create container from ${CMFKIT_READYBAKE_IMAGE}"
-  # replicate current env inside docker container and execute
 
-[[ $CMFKIT_PLATFORM =~ readybake ]] && _readybake_exec
-
-_debug "[[ \$CMFKIT_PLATFORM =~ readybake ]] && _readybake_exec ---- return val is $?"
-
-# _error  "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+[[ $CMFKIT_PLATFORM =~ readybake ]] && rc=1 && _readybake_exec && rc=0
+[[ $CMFKIT_PLATFORM =~ readybake ]] && [[ "${rc}" -ne 0 ]] \
+  && _dugout_demolish \
+  && exit 1
 
 # ------------
 
