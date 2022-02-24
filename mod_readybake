@@ -73,8 +73,6 @@ _readybake_init() {
       ${readybake_image}
   )
 
-  #/bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
-
   [[ -n ${container_id} ]] || return 1
 
   cat > ${dugout_dir}/readybake_launch.sh <<-__EOF__
