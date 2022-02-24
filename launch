@@ -109,7 +109,7 @@ __import || echo "cmfkit >> [Info] << scenario/$CMFKIT_SCENARIO __import() not p
   && _deflist_accrue_vars
 
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
-  && [[ $CMFKIT_SCENARIO_PHASE_SELECT == all ]] && rc=1 \
+  && [[ -z $CMFKIT_SCENARIO_PHASE_SELECT ]] && rc=1 \
   && ( __build || _error  "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \
   && ( __test  || _error   "test failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \
   && rc=0
