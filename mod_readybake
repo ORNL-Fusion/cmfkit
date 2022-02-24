@@ -63,10 +63,13 @@ _readybake_init() {
 
   local container_id
 
+  _deflist_export_vars > ${dugout_dir}/readybake_env
+
   read container_id <<< $(
     docker create \
         --interactive --tty \
         --workdir /usr/local/src \
+        --env-file ${dugout_dir}/readybake_env \
       ${readybake_image}
   )
 
@@ -89,6 +92,8 @@ _readybake_init() {
 	cd /usr/local/src
 
 	cd \$(ls -1) || _error_fatal "unable to locate project dir"
+
+	__import || echo "cmfkit >> [Info] << scenario/$CMFKIT_SCENARIO __import() not present"
 
 	[[ -z "\$1" ]] \\
 	  && ( __build || _error "build failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" ) \\
@@ -115,6 +120,7 @@ _readybake_init() {
 _readybake_exec() {
 
   local readonly scenario_phase="$CMFKIT_SCENARIO_PHASE_SELECT"
+  local rc
 
   [[ -n "$CMFKIT_READYBAKE_CONTAINER_ID" ]] || return 1
 
@@ -124,13 +130,15 @@ _readybake_exec() {
       --interactive $CMFKIT_READYBAKE_CONTAINER_ID \
     /bin/bash -c "/usr/local/cmfkit/readybake_launch.sh ${scenario_phase}"
 
+  rc="$?"
+
   [[ $CMFKIT_READYBAKE_INTERACTIVE =~ true ]] \
     && docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
 
-  docker stop    $CMFKIT_READYBAKE_CONTAINER_ID
+  docker stop -t 1   $CMFKIT_READYBAKE_CONTAINER_ID
   docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
 
-  echo
+  return "${rc}"
 }
 
 

@@ -74,6 +74,10 @@ CMFKIT_SCENARIO_PHASE_SELECT="$1"
   && _dugout_demolish \
   && _error_fatal "unable to select platform"
 
+. $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO || _error_fatal "unable to load scenario"
+
+__import || echo "cmfkit >> [Info] << scenario/$CMFKIT_SCENARIO __import() not present"
+
 # ------------
 
 [[ -n "$CMFKIT_READYBAKE_IMAGE_SEED" ]] \
@@ -97,17 +101,17 @@ CMFKIT_SCENARIO_PHASE_SELECT="$1"
   && _error_fatal "unable to create container from ${CMFKIT_READYBAKE_IMAGE}"
   # replicate current env inside docker container and execute
 
-[[ $CMFKIT_PLATFORM =~ readybake ]] \
-  && ( _readybake_exec || _error  "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
+[[ $CMFKIT_PLATFORM =~ readybake ]] && _readybake_exec
+
+_debug "[[ \$CMFKIT_PLATFORM =~ readybake ]] && _readybake_exec ---- return val is $?"
+
+# _error  "$1 failure: 'scenario/$CMFKIT_SCENARIO' on '$CMFKIT_PLATFORM'" )
 
 # ------------
 
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
   && . $CMFKIT_DUGOUT_DIR/platform/$CMFKIT_PLATFORM/setup \
   && _deflist_accrue_vars
-
-[[ ! $CMFKIT_PLATFORM =~ readybake ]] \
-  && . $CMFKIT_DUGOUT_DIR/scenario/$CMFKIT_SCENARIO
 
 [[ ! $CMFKIT_PLATFORM =~ readybake ]] \
   && [[ $CMFKIT_SCENARIO_PHASE_SELECT == all ]] \
