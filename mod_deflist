@@ -94,7 +94,7 @@ _deflist_render_cmdline() {
 }
 
 
-_deflist_print_cmdline() {
+_deflist_report_cmdline() {
 
   echo "."
   echo "."
