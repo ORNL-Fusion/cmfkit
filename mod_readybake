@@ -139,8 +139,8 @@ _readybake_exec() {
   [[ $CMFKIT_READYBAKE_INTERACTIVE =~ true ]] \
     && docker attach  $CMFKIT_READYBAKE_CONTAINER_ID
 
-  docker stop -t 1   $CMFKIT_READYBAKE_CONTAINER_ID
-  docker rm      $CMFKIT_READYBAKE_CONTAINER_ID
+  docker stop -t 1  $CMFKIT_READYBAKE_CONTAINER_ID
+  docker rm         $CMFKIT_READYBAKE_CONTAINER_ID
 
   return "${rc}"
 }
